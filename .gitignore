@@ -6,6 +6,7 @@ server/dist/
 test-results/
 playwright-report/
 .letta/
+forks/letta-code/
 server/test-results/
 **/test-results/
 **/playwright-report/

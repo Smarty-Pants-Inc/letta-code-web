@@ -321,28 +321,57 @@ export class Session {
   private getRunnerCommand(): { file: string; args: string[]; cwd: string } {
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
     // session.ts is in server/src (dev) or server/dist (prod).
-    // In both cases, the repo root is two directories up from here.
-    const repoRoot = path.resolve(__dirname, "../..");
+    // In both cases, the letta-code-web repo root is two directories up from here.
+    const webRepoRoot = path.resolve(__dirname, "../..");
+
+    // In a wrapper monorepo, letta-code-web may live under apps/, and the actual
+    // workspace root is higher up (where forks/letta-code lives).
+    const workspaceRoot =
+      process.env.WORKSPACE_ROOT && process.env.WORKSPACE_ROOT.trim()
+        ? path.resolve(process.env.WORKSPACE_ROOT)
+        : (() => {
+            let cur = webRepoRoot;
+            for (let i = 0; i < 6; i++) {
+              const candidate = path.join(
+                cur,
+                "forks",
+                "letta-code",
+                "src",
+                "index.ts",
+              );
+              if (fs.existsSync(candidate)) return cur;
+
+              const parent = path.dirname(cur);
+              if (parent === cur) break;
+              cur = parent;
+            }
+            return webRepoRoot;
+          })();
+
+    const lettaCodeDir =
+      process.env.LETTA_CODE_DIR && process.env.LETTA_CODE_DIR.trim()
+        ? path.resolve(process.env.LETTA_CODE_DIR)
+        : path.join(workspaceRoot, "forks", "letta-code");
 
     if (this.runner === "mock") {
       return {
         file: process.execPath,
         args: [path.resolve(__dirname, "./runner/mock-runner.js")],
-        cwd: repoRoot,
+        cwd: workspaceRoot,
       };
     }
 
     if (this.runner === "letta") {
       const bun = process.env.BUN ?? "bun";
-      const bunConfig = path.resolve(repoRoot, "forks/letta-code/bunfig.toml");
+      const bunConfig = path.resolve(lettaCodeDir, "bunfig.toml");
       return {
         file: bun,
         args: [
           `--config=${bunConfig}`,
           "run",
-          path.resolve(repoRoot, "forks/letta-code/src/index.ts"),
+          path.resolve(lettaCodeDir, "src", "index.ts"),
         ],
-        cwd: repoRoot,
+        cwd: workspaceRoot,
       };
     }
 
@@ -350,7 +379,7 @@ export class Session {
     return {
       file: process.execPath,
       args: [path.resolve(__dirname, "./runner/seam-runner.js")],
-      cwd: repoRoot,
+      cwd: workspaceRoot,
     };
   }
 

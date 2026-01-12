@@ -1,8 +1,15 @@
 import { spawn } from "node:child_process";
 import path from "node:path";
 
-const repoRoot = process.cwd();
-const lettaCodeDir = path.join(repoRoot, "forks", "letta-code");
+const workspaceRoot =
+  process.env.WORKSPACE_ROOT && process.env.WORKSPACE_ROOT.trim()
+    ? path.resolve(process.env.WORKSPACE_ROOT)
+    : process.cwd();
+
+const lettaCodeDir =
+  process.env.LETTA_CODE_DIR && process.env.LETTA_CODE_DIR.trim()
+    ? path.resolve(process.env.LETTA_CODE_DIR)
+    : path.join(workspaceRoot, "forks", "letta-code");
 
 const bun = process.env.BUN ?? "bun";
 const child = spawn(
