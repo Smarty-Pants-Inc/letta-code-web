@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.DS_Store
+web/dist/
+server/dist/
+test-results/
+playwright-report/
+.letta/
+server/test-results/
+**/test-results/
+**/playwright-report/

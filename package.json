@@ -1,0 +1,20 @@
+{
+  "name": "letta-code-web-tui-poc",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "postinstall": "node ./scripts/fix-node-pty-perms.mjs",
+    "build": "npm -w web run build && npm -w server run build",
+    "lint": "biome check scripts server/src server/tests web/src web/vite.config.ts server/playwright.config.ts",
+    "lint:fix": "biome check --write scripts server/src server/tests web/src web/vite.config.ts server/playwright.config.ts",
+    "typecheck": "npm -w web run typecheck && npm -w server run typecheck",
+    "test:e2e": "npm run build && npm -w server run test:e2e"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.2.5"
+  }
+}

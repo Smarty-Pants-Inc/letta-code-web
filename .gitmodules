@@ -1,0 +1,4 @@
+[submodule "forks/letta-code"]
+	path = forks/letta-code
+	url = https://github.com/Smarty-Pants-Inc/letta-code.git
+	branch = main
